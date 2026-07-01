@@ -1,0 +1,13 @@
+Table Name: app_users
+Description: Database table schema DDL definitions and structure mapping for table app_users.
+DDL:
+
+CREATE TABLE app_users (
+	id INTEGER NOT NULL, 
+	name VARCHAR(255) NOT NULL, 
+	email VARCHAR(255) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	auth_provider VARCHAR(50) NOT NULL, 
+	encrypted_gemini_key TEXT, 
+	created_at DATETIME DEFAULT now() NOT NULL, 
+	PRIMARY KEY (id)
