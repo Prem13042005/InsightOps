@@ -90,9 +90,18 @@ async def login(user_in: UserLogin, db: AsyncSession = Depends(get_db)):
     Authenticates user using email and password.
     Returns a secure JWT access token with a 60-minute expiry window.
     """
+    print(f"\n[DEBUG LOGIN] Incoming request payload: email={user_in.email}")
+    
     # 1. Fetch user record
     stmt = select(AppUser).where(AppUser.email == user_in.email)
     user = (await db.execute(stmt)).scalars().first()
+
+    if not user:
+        print(f"[DEBUG LOGIN] Authentication failed: No user found for email '{user_in.email}'.")
+    else:
+        print(f"[DEBUG LOGIN] User found in database: ID={user.id}, auth_provider={user.auth_provider}")
+        is_password_valid = verify_password(user_in.password, user.password_hash)
+        print(f"[DEBUG LOGIN] Password match status: {is_password_valid}")
 
     # 2. Check existence and password
     if not user or user.auth_provider != "local" or not verify_password(user_in.password, user.password_hash):
@@ -100,6 +109,7 @@ async def login(user_in: UserLogin, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
+
 
     # 3. Create session JWT access token
     access_token = create_access_token(data={"sub": str(user.id)})

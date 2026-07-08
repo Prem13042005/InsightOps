@@ -17,14 +17,20 @@ def create_app() -> FastAPI:
         version="1.0.0"
     )
 
-    # Configure CORS middleware to accept requests from Lovable development ports
+    # Configure CORS middleware to accept requests from development ports
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,
+        allow_origins=[
+            "http://localhost:8081",
+            "http://127.0.0.1:8081",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
 
     # Register authentication, analytics, integrations, and user settings sub-routers under /api/v1 path namespace
     app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
